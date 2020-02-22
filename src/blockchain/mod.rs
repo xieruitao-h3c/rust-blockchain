@@ -153,39 +153,46 @@ impl Block {
     }
 }
 
-#[test]
-fn test_blockchain_mine() {
-    let mut mp = crate::mempool::Mempool::new();
+#[cfg(test)]
+mod tests {
+    use crate::blockchain::*;
+    use crate::mempool::Mempool;
+    use crate::config::SETTINGS;
 
-    let min_tx_per_block = crate::config::SETTINGS.get::<usize>("min_tx_per_block").unwrap();
-    let difficulty = crate::config::SETTINGS.get::<usize>("difficulty").unwrap();
-    let concurrent_hashes = crate::config::SETTINGS.get::<u64>("concurrent_hashes").unwrap();
+    #[test]
+    fn test_blockchain_mine() {
+        let mut mp = Mempool::new();
 
-    for i in 0..min_tx_per_block {
-        mp.add(Tx {
-            from: 'A',
-            to: std::char::from_digit(i as u32, 10).unwrap(),
-            amount: 1,
-            fee: i as f32 * 0.1
-        });
-    }
+        let min_tx_per_block = SETTINGS.get::<usize>("min_tx_per_block").unwrap();
+        let difficulty = SETTINGS.get::<usize>("difficulty").unwrap();
+        let concurrent_hashes = SETTINGS.get::<u64>("concurrent_hashes").unwrap();
 
-    let bc = Blockchain::new(min_tx_per_block, difficulty, concurrent_hashes);
-    let mut nonce: u64 = 0;
+        for i in 0..min_tx_per_block {
+            mp.add(Tx {
+                from: 'A',
+                to: std::char::from_digit(i as u32, 10).unwrap(),
+                amount: 1,
+                fee: i as f32 * 0.1
+            });
+        }
 
-    loop {
-        nonce += concurrent_hashes;
-        if let Some(block) = bc.mine(1111, nonce, SystemTime::now(), mp.get_all().to_vec()) {
-            assert_eq!(block.hash[..difficulty], "0".repeat(difficulty));
-            assert_eq!(block.len(), min_tx_per_block);
+        let bc = Blockchain::new(min_tx_per_block, difficulty, concurrent_hashes);
+        let mut nonce: u64 = 0;
 
-            break;
+        loop {
+            nonce += concurrent_hashes;
+            if let Some(block) = bc.mine(1111, nonce, SystemTime::now(), mp.get_all().to_vec()) {
+                assert_eq!(block.hash[..difficulty], "0".repeat(difficulty));
+                assert_eq!(block.len(), min_tx_per_block);
+
+                break;
+            }
         }
     }
-}
 
-#[test]
-fn test_block_generate_hash() {
-    let block = Block::new(1, "".to_string(), vec![], 0, 0);
-    assert_eq!(block.generate_hash()[..6], "b9e0e5".to_string());
+    #[test]
+    fn test_block_generate_hash() {
+        let block = Block::new(1, "".to_string(), vec![], 0, 0);
+        assert_eq!(block.generate_hash()[..6], "b9e0e5".to_string());
+    }
 }

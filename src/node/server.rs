@@ -1,6 +1,6 @@
 use std::thread;
 use std::net::{TcpListener, TcpStream};
-use std::io::prelude::*;
+use std::io::{prelude::*, BufReader};
 use std::io;
 use std::sync::{Mutex, Arc, mpsc};
 
@@ -15,14 +15,14 @@ fn handler(
     blockchain: &Arc<Mutex<Blockchain>>,
     mempool: &Arc<Mutex<Mempool>>,
 ) -> io::Result<()> {
-    let mut rdr = io::BufReader::new(stream);
+    let mut rdr = BufReader::new(stream);
     let mut text = String::new();
     rdr.read_line(&mut text)?;
     if text.trim().is_empty() {
         return Ok(())
     }
 
-    // received a request to fast-sync either blocks or txs
+    // received a request to sync either blocks or txs
     if let Ok(command) = serde_json::from_str::<Command<SyncRequest>>(&text) {
         let payload = &command.payload;
 
@@ -59,7 +59,7 @@ fn handler(
         return Ok(());
     }
 
-    // received a blocks response from requested fast-sync
+    // received a blocks response from requested sync
     if let Ok(command) = serde_json::from_str::<Command<SyncResponse<Block>>>(&text) {
         let payload = &command.payload;
         let mut bc = blockchain.lock().unwrap();
@@ -71,7 +71,7 @@ fn handler(
         return Ok(());
     }
 
-    // received a txs response from a requested fast-sync
+    // received a txs response from a requested sync
     if let Ok(command) = serde_json::from_str::<Command<SyncResponse<Tx>>>(&text) {
         let payload = &command.payload;
         let mut mp = mempool.lock().unwrap();
@@ -146,7 +146,7 @@ pub fn start(
             // let the miner know what port we're listening on
             tx.send(local_port).unwrap();
 
-            // send a fast-sync request for any missed blocks & txs
+            // send a sync request for any missed blocks & txs
             let peers = get_live_peers(&[], local_port);
             if !peers.is_empty() {
                 for action in &[

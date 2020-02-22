@@ -8,7 +8,7 @@ pub enum ObjectType {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum ActionType {
-    // used for fast-syncing blocks and tx
+    // used for syncing blocks and tx
     SyncRequest(ObjectType),
     SyncResponse(ObjectType),
 

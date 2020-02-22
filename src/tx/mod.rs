@@ -1,4 +1,5 @@
-use std::{thread, time};
+use std::thread;
+use std::time::Duration;
 use std::sync::mpsc::channel;
 use rand::prelude::*;
 use crate::types::*;
@@ -44,7 +45,7 @@ pub fn generate(ports: Vec<u16>) {
             }
 
             let secs: u64 = if broadcast_random { rng.gen_range(1, 5) } else { 3 };
-            thread::sleep(time::Duration::from_secs(secs));
+            thread::sleep(Duration::from_secs(secs));
 
             i += 1;
         }

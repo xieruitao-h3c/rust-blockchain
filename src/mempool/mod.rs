@@ -54,62 +54,68 @@ impl Mempool {
     }
 }
 
-#[test]
-fn test_add_once() {
-    let mut mp = Mempool::new();
+#[cfg(test)]
+mod tests {
+    use crate::mempool::Mempool;
+    use crate::types::Tx;
 
-    let tx1 = Tx {
-        from: 'A',
-        to: 'B',
-        amount: 1,
-        fee: 0.123,
-    };
-    let tx2 = tx1.clone();
+    #[test]
+    fn test_add_once() {
+        let mut mp = Mempool::new();
 
-    assert_eq!(mp.add(tx1), true);
-    assert_eq!(mp.add(tx2), false);
-    assert_eq!(mp.len(), 1);
-}
+        let tx1 = Tx {
+            from: 'A',
+            to: 'B',
+            amount: 1,
+            fee: 0.123,
+        };
+        let tx2 = tx1.clone();
 
-#[test]
-fn test_add_with_higher_fee() {
-    let mut mp = Mempool::new();
+        assert_eq!(mp.add(tx1), true);
+        assert_eq!(mp.add(tx2), false);
+        assert_eq!(mp.len(), 1);
+    }
 
-    let tx1 = Tx {
-        from: 'A',
-        to: 'B',
-        amount: 1,
-        fee: 0.123,
-    };
-    let mut tx2 = tx1.clone();
-    tx2.fee = 0.456;
+    #[test]
+    fn test_add_with_higher_fee() {
+        let mut mp = Mempool::new();
 
-    assert_eq!(mp.add(tx1), true);
-    assert_eq!(mp.add(tx2), true);
-    assert_eq!(mp.len(), 1);
-    assert_eq!(mp.get_all()[0].fee, 0.456);
-}
+        let tx1 = Tx {
+            from: 'A',
+            to: 'B',
+            amount: 1,
+            fee: 0.123,
+        };
+        let mut tx2 = tx1.clone();
+        tx2.fee = 0.456;
 
-#[test]
-fn test_get_all() {
-    let mut mp = Mempool::new();
+        assert_eq!(mp.add(tx1), true);
+        assert_eq!(mp.add(tx2), true);
+        assert_eq!(mp.len(), 1);
+        assert_eq!(mp.get_all()[0].fee, 0.456);
+    }
 
-    mp.add(Tx { from: 'A', to: 'B', amount: 1, fee: 0.234 });
-    mp.add(Tx { from: 'B', to: 'C', amount: 1, fee: 0.345 });
-    mp.add(Tx { from: 'C', to: 'D', amount: 1, fee: 0.123 });
+    #[test]
+    fn test_get_all() {
+        let mut mp = Mempool::new();
 
-    let txs = mp.get_all();
-    assert_eq!(txs[0].fee, 0.345);
-    assert_eq!(txs[1].fee, 0.234);
-    assert_eq!(txs[2].fee, 0.123);
-}
+        mp.add(Tx { from: 'A', to: 'B', amount: 1, fee: 0.234 });
+        mp.add(Tx { from: 'B', to: 'C', amount: 1, fee: 0.345 });
+        mp.add(Tx { from: 'C', to: 'D', amount: 1, fee: 0.123 });
 
-#[test]
-fn test_remove() {
-    let mut mp = Mempool::new();
-    let tx = Tx { from: 'A', to: 'B', amount: 1, fee: 0.234 };
+        let txs = mp.get_all();
+        assert_eq!(txs[0].fee, 0.345);
+        assert_eq!(txs[1].fee, 0.234);
+        assert_eq!(txs[2].fee, 0.123);
+    }
 
-    assert_eq!(mp.add(tx.clone()), true);
-    assert_eq!(mp.remove(&tx), true);
-    assert_eq!(mp.remove(&tx), false);
+    #[test]
+    fn test_remove() {
+        let mut mp = Mempool::new();
+        let tx = Tx { from: 'A', to: 'B', amount: 1, fee: 0.234 };
+
+        assert_eq!(mp.add(tx.clone()), true);
+        assert_eq!(mp.remove(&tx), true);
+        assert_eq!(mp.remove(&tx), false);
+    }
 }
