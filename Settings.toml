@@ -1,0 +1,6 @@
+difficulty = 2
+min_tx_per_block = 5
+concurrent_hashes = 256
+broadcast_random = true
+debug_broadcast = false
+debug_perf = true
