@@ -1,5 +1,4 @@
 use std::time::SystemTime;
-use std::net::SocketAddr;
 use rayon::prelude::*;
 use crate::types::*;
 use serde::{Serialize, Deserialize};
@@ -41,7 +40,7 @@ impl Blockchain {
 
     pub fn mine(
         &self,
-        id: SocketAddr,
+        id: u16,
         nonce: u64,
         time: SystemTime,
         txs: Vec<Tx>,
@@ -106,7 +105,7 @@ impl Blockchain {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Block {
-    pub id: SocketAddr,
+    pub id: u16,
     pub nonce: u64,
     pub hash: String,
     pub prev: String,
@@ -115,7 +114,7 @@ pub struct Block {
 }
 
 impl Block {
-    pub fn new(id: SocketAddr, prev: String, txs: Vec<Tx>, nonce: u64, ms: u128) -> Self {
+    pub fn new(id: u16, prev: String, txs: Vec<Tx>, nonce: u64, ms: u128) -> Self {
         Block {
             id,
             nonce,
@@ -156,7 +155,6 @@ impl Block {
 
 #[cfg(test)]
 mod tests {
-    use std::net::{IpAddr, Ipv4Addr};
     use crate::blockchain::*;
     use crate::mempool::Mempool;
     use crate::config::SETTINGS;
@@ -164,7 +162,6 @@ mod tests {
     #[test]
     fn test_blockchain_mine() {
         let mut mp = Mempool::new();
-        let whoami = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 0);
 
         let min_tx_per_block = SETTINGS.get::<usize>("min_tx_per_block").unwrap();
         let difficulty = SETTINGS.get::<usize>("difficulty").unwrap();
@@ -184,7 +181,7 @@ mod tests {
 
         loop {
             nonce += concurrent_hashes;
-            if let Some(block) = bc.mine(whoami, nonce, SystemTime::now(), mp.get_all().to_vec()) {
+            if let Some(block) = bc.mine(1111, nonce, SystemTime::now(), mp.get_all().to_vec()) {
                 assert_eq!(block.hash[..difficulty], "0".repeat(difficulty));
                 assert_eq!(block.len(), min_tx_per_block);
 
@@ -195,8 +192,7 @@ mod tests {
 
     #[test]
     fn test_block_generate_hash() {
-        let whoami = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 0);
-        let block = Block::new(whoami, "".to_string(), vec![], 0, 0);
-        assert_eq!(block.generate_hash()[..6], "156320".to_string());
+        let block = Block::new(1, "".to_string(), vec![], 0, 0);
+        assert_eq!(block.generate_hash()[..6], "b9e0e5".to_string());
     }
 }

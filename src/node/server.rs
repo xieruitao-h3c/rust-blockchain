@@ -1,17 +1,17 @@
 use std::thread;
-use std::net::{TcpListener, TcpStream, SocketAddr, Ipv4Addr};
+use std::net::{TcpListener, TcpStream};
 use std::io::{prelude::*, BufReader};
 use std::io;
 use std::sync::{Mutex, Arc, mpsc};
+
 use crate::types::*;
 use crate::utils::*;
 use crate::mempool::Mempool;
 use crate::blockchain::*;
-use crate::config::*;
 
 fn handler(
     stream: TcpStream,
-    whoami: SocketAddr,
+    local_port: u16,
     blockchain: &Arc<Mutex<Blockchain>>,
     mempool: &Arc<Mutex<Mempool>>,
 ) -> io::Result<()> {
@@ -20,11 +20,6 @@ fn handler(
     rdr.read_line(&mut text)?;
     if text.trim().is_empty() {
         return Ok(())
-    }
-
-    let debug_broadcast = SETTINGS.get::<bool>("debug_broadcast").unwrap();
-    if debug_broadcast {
-        println!("received: {}", text.trim());
     }
 
     // received a request to sync either blocks or txs
@@ -41,8 +36,8 @@ fn handler(
                 let _ = broadcast::<SyncResponse<Block>>(
                     ActionType::SyncResponse(ObjectType::Block),
                     &SyncResponse::<Block> { data: blocks },
-                    &[payload.peer],
-                    None,
+                    &[payload.port],
+                    0,
                 );
             },
             ActionType::SyncRequest(ObjectType::Tx) => {
@@ -54,8 +49,8 @@ fn handler(
                 let _ = broadcast::<SyncResponse<Tx>>(
                     ActionType::SyncResponse(ObjectType::Tx),
                     &SyncResponse::<Tx> { data: txs },
-                    &[payload.peer],
-                    None,
+                    &[payload.port],
+                    0,
                 );
             },
             _ => (),
@@ -124,7 +119,7 @@ fn handler(
                 ActionType::Broadcast(ObjectType::Tx),
                 tx,
                 &[],
-                Some(whoami),
+                local_port,
             );
         }
 
@@ -136,24 +131,23 @@ fn handler(
 
 #[warn(unreachable_code)]
 pub fn start(
-    tx: mpsc::Sender<SocketAddr>,
+    tx: mpsc::Sender<u16>,
     blockchain: Arc<Mutex<Blockchain>>,
     mempool: Arc<Mutex<Mempool>>,
-    peers: Vec<SocketAddr>,
 ) -> thread::JoinHandle<()> {
     thread::spawn(move || {
-        let ipv4 = if peers.is_empty() { Ipv4Addr::new(127, 0, 0, 1) } else { Ipv4Addr::new(0, 0, 0, 0) };
-        let addrs = get_all_peers(&[], None, Some(ipv4));
+        let addrs = get_all_peers(&[], 0);
         let listener = TcpListener::bind(&addrs[..]).expect("could not bind");
 
         if let Ok(addr) = listener.local_addr() {
             println!("> listening on {}...", addr);
+            let local_port = addr.port();
 
-            // let the miner know what our own address is
-            tx.send(addr).unwrap();
+            // let the miner know what port we're listening on
+            tx.send(local_port).unwrap();
 
             // send a sync request for any missed blocks & txs
-            let peers = get_live_peers(&peers, Some(addr), None);
+            let peers = get_live_peers(&[], local_port);
             if !peers.is_empty() {
                 for action in &[
                     ActionType::SyncRequest(ObjectType::Tx),
@@ -161,9 +155,9 @@ pub fn start(
                 ] {
                     let _ = broadcast::<SyncRequest>(
                         action.clone(),
-                        &SyncRequest { peer: addr },
-                        &[peers[0]],
-                        None,
+                        &SyncRequest { port: local_port },
+                        &[peers[0].port()],
+                        0,
                     );
                 }
             }
@@ -173,7 +167,7 @@ pub fn start(
                 if let Ok((stream, _)) = listener.accept() {
                     if let Err(e) = handler(
                         stream,
-                        addr,
+                        local_port,
                         &blockchain,
                         &mempool,
                     ) {

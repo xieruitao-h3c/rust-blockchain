@@ -1,8 +1,6 @@
 #[macro_use]
 extern crate lazy_static;
 
-use std::net::SocketAddr;
-
 mod config;
 mod args;
 mod types;
@@ -16,22 +14,22 @@ fn main() {
     let args = args::get();
     match args {
         args::Args { cmd_broadcast: true, .. } => {
-            let peers: Vec<SocketAddr> = args.arg_peers;
-            if peers.is_empty() {
+            let ports: Vec<u16> = args.arg_ports;
+            if ports.is_empty() {
                 println!("broadcasting to all:");
             } else {
-                let peers_joined = peers
+                let ports_joined = ports
                     .iter()
                     .map(|&p| p.to_string())
                     .collect::<Vec<_>>()
                     .join(",");
-                println!("broadcasting to {}:", peers_joined);
+                println!("broadcasting to {}:", ports_joined);
             }
-            tx::generate(peers);
+            tx::generate(ports);
         },
         args::Args { cmd_mine: true, .. } => {
             println!("starting the node:");
-            node::start(args.arg_peers);
+            node::start();
         },
         _ => (),
     }

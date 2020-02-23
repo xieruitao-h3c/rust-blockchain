@@ -1,4 +1,3 @@
-use std::net::SocketAddr;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -34,7 +33,7 @@ impl<T> Command<T> {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SyncRequest {
-    pub peer: SocketAddr,
+    pub port: u16,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

@@ -1,68 +1,45 @@
 use std::io::prelude::*;
-use std::clone::Clone;
-use std::net::{TcpStream, SocketAddr, IpAddr, Ipv4Addr};
+use std::net::{TcpStream, SocketAddr};
 use crate::types::*;
 use serde_json::Result;
+use std::clone::Clone;
 use serde::ser::Serialize;
 use crate::config::*;
 
-pub fn get_all_peers(
-    peers: &[SocketAddr],
-    mut whoami: Option<SocketAddr>,
-    mut ipv4: Option<Ipv4Addr>,
-) -> Vec<SocketAddr> {
+pub fn get_all_peers(ports: &[u16], local_port: u16) -> Vec<SocketAddr> {
     let mut pool: Vec<SocketAddr> = vec![];
 
-    if whoami.is_none() {
-        whoami = Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 0));
-    }
+    let default_ports = &[4000 as u16, 4001, 4002, 4003, 4004];
+    let range = if ports.is_empty() { default_ports } else { ports };
 
-    if ipv4.is_none() {
-        ipv4 = Some(Ipv4Addr::new(127, 0, 0, 1));
-    }
-
-    let ip = IpAddr::V4(ipv4.unwrap());
-    let defaults = &[
-        SocketAddr::new(ip, 4000),
-        SocketAddr::new(ip, 4001),
-        SocketAddr::new(ip, 4002),
-        SocketAddr::new(ip, 4003),
-        SocketAddr::new(ip, 4004),
-    ];
-
-    let range = if peers.is_empty() { defaults } else { peers };
-    for peer in range.iter().filter(|&p| *p != whoami.unwrap()) {
-        pool.push(*peer);
+    for port in range.iter().filter(|&p| *p != local_port) {
+        pool.push(SocketAddr::from(([127, 0, 0, 1], *port)));
     }
 
     pool
 }
 
-pub fn get_live_peers(
-    peers: &[SocketAddr],
-    whoami: Option<SocketAddr>,
-    ipv4: Option<Ipv4Addr>,
-) -> Vec<SocketAddr> {
-    let mut ret: Vec<SocketAddr> = vec![];
+pub fn get_live_peers(ports: &[u16], local_port: u16) -> Vec<SocketAddr> {
+    let mut peers: Vec<SocketAddr> = vec![];
 
-    for addr in get_all_peers(peers, whoami, ipv4) {
+    for addr in get_all_peers(ports, local_port) {
         if TcpStream::connect(&addr).is_ok() {
-            ret.push(addr);
+            peers.push(addr);
         }
     }
 
-    ret
+    peers
 }
 
 pub fn broadcast<T>(
     action: ActionType,
     payload: &T,
-    peers: &[SocketAddr],
-    whoami: Option<SocketAddr>,
+    peers: &[u16],
+    local_port: u16,
 ) -> Result<()>
     where T: Clone + Serialize
 {
-    let pool = get_live_peers(peers, whoami, None);
+    let pool = get_live_peers(peers, local_port);
     if pool.is_empty() {
         return Ok(())
     }
@@ -71,7 +48,7 @@ pub fn broadcast<T>(
     if debug_broadcast {
         let pool_str = pool
             .iter()
-            .map(|&sa| sa.to_string())
+            .map(|&sa| sa.port().to_string())
             .collect::<Vec<_>>()
             .join(",");
 

@@ -1,6 +1,5 @@
 use std::thread;
 use std::time::Duration;
-use std::net::SocketAddr;
 use std::sync::mpsc::channel;
 use rand::prelude::*;
 use crate::types::*;
@@ -19,7 +18,7 @@ fn get_wallets(randomize: bool, i: usize) -> (char, char) {
     )
 }
 
-pub fn generate(peers: Vec<SocketAddr>) {
+pub fn generate(ports: Vec<u16>) {
     let broadcast_random = SETTINGS.get::<bool>("broadcast_random").unwrap();
 
     let mut txs: Vec<Tx> = vec![];
@@ -57,8 +56,8 @@ pub fn generate(peers: Vec<SocketAddr>) {
         broadcast::<Tx>(
             ActionType::Broadcast(ObjectType::Tx),
             &tx,
-            &peers,
-            None,
+            &ports,
+            0,
         ).expect("could not broadcast");
         txs.push(tx);
     }
