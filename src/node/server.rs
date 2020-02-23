@@ -14,6 +14,7 @@ fn handler(
     whoami: SocketAddr,
     blockchain: &Arc<Mutex<Blockchain>>,
     mempool: &Arc<Mutex<Mempool>>,
+    peers: &[SocketAddr],
 ) -> io::Result<()> {
     let mut rdr = BufReader::new(stream);
     let mut text = String::new();
@@ -30,6 +31,7 @@ fn handler(
     // received a request to sync either blocks or txs
     if let Ok(command) = serde_json::from_str::<Command<SyncRequest>>(&text) {
         let payload = &command.payload;
+        let fwd_peers = &[payload.peer];
 
         match &command.action {
             ActionType::SyncRequest(ObjectType::Block) => {
@@ -41,7 +43,7 @@ fn handler(
                 let _ = broadcast::<SyncResponse<Block>>(
                     ActionType::SyncResponse(ObjectType::Block),
                     &SyncResponse::<Block> { data: blocks },
-                    &[payload.peer],
+                    if peers.is_empty() { fwd_peers } else { peers },
                     None,
                 );
             },
@@ -54,7 +56,7 @@ fn handler(
                 let _ = broadcast::<SyncResponse<Tx>>(
                     ActionType::SyncResponse(ObjectType::Tx),
                     &SyncResponse::<Tx> { data: txs },
-                    &[payload.peer],
+                    if peers.is_empty() { fwd_peers } else { peers },
                     None,
                 );
             },
@@ -123,7 +125,7 @@ fn handler(
             let _ = broadcast::<Tx>(
                 ActionType::Broadcast(ObjectType::Tx),
                 tx,
-                &[],
+                peers,
                 Some(whoami),
             );
         }
@@ -176,6 +178,7 @@ pub fn start(
                         addr,
                         &blockchain,
                         &mempool,
+                        &peers,
                     ) {
                         println!("handler failed, {}", e);
                     }
