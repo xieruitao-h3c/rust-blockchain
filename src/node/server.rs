@@ -33,12 +33,12 @@ fn handler(
                     bc.get_all().to_vec()
                 };
 
-                let _ = broadcast::<SyncResponse<Block>>(
+                broadcast::<SyncResponse<Block>>(
                     ActionType::SyncResponse(ObjectType::Block),
                     &SyncResponse::<Block> { data: blocks },
                     &[payload.port],
                     0,
-                );
+                ).unwrap();
             },
             ActionType::SyncRequest(ObjectType::Tx) => {
                 let txs = {
@@ -46,12 +46,12 @@ fn handler(
                     mp.get_all().to_vec()
                 };
 
-                let _ = broadcast::<SyncResponse<Tx>>(
+                broadcast::<SyncResponse<Tx>>(
                     ActionType::SyncResponse(ObjectType::Tx),
                     &SyncResponse::<Tx> { data: txs },
                     &[payload.port],
                     0,
-                );
+                ).unwrap();
             },
             _ => (),
         }
@@ -115,12 +115,12 @@ fn handler(
 
         if added {
             println!("added {:?} to mempool ({} total)", tx, mp_count);
-            let _ = broadcast::<Tx>(
+            broadcast::<Tx>(
                 ActionType::Broadcast(ObjectType::Tx),
                 tx,
                 &[],
                 local_port,
-            );
+            ).unwrap();
         }
 
         return Ok(());
@@ -153,12 +153,12 @@ pub fn start(
                     ActionType::SyncRequest(ObjectType::Tx),
                     ActionType::SyncRequest(ObjectType::Block),
                 ] {
-                    let _ = broadcast::<SyncRequest>(
+                    broadcast::<SyncRequest>(
                         action.clone(),
                         &SyncRequest { port: local_port },
                         &[peers[0].port()],
                         0,
-                    );
+                    ).unwrap();
                 }
             }
 

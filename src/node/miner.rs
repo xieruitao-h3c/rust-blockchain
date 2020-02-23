@@ -68,12 +68,12 @@ pub fn start(
                 }
 
                 // broadcast the new block
-                let _ = broadcast::<Block>(
+                broadcast::<Block>(
                     ActionType::Broadcast(ObjectType::Block),
                     &block,
                     &[],
                     local_port,
-                );
+                ).unwrap();
 
                 // add new block to chain
                 {

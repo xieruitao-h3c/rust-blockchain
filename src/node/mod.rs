@@ -21,6 +21,6 @@ pub fn start() {
     threads.push(miner::start(rx, Arc::clone(&blockchain), Arc::clone(&mempool)));
 
     for t in threads {
-        let _ = t.join();
+        t.join().unwrap();
     }
 }
