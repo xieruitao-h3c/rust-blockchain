@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 use std::thread;
+use std::net::SocketAddr;
 use std::sync::{Mutex, Arc, mpsc};
 use crate::mempool::Mempool;
 use crate::blockchain::*;
@@ -7,13 +8,14 @@ use crate::utils::*;
 use crate::types::*;
 
 pub fn start(
-    rx: mpsc::Receiver<u16>,
+    rx: mpsc::Receiver<SocketAddr>,
     blockchain: Arc<Mutex<Blockchain>>,
     mempool: Arc<Mutex<Mempool>>,
+    peers: Vec<SocketAddr>,
 ) -> thread::JoinHandle<()> {
     thread::spawn(move || {
         println!("> miner started mining...");
-        let local_port: u16 = rx.recv().unwrap();
+        let whoami: SocketAddr = rx.recv().unwrap();
 
         let mut time = SystemTime::now();
         let mut nonce: u64 = 0;
@@ -40,7 +42,7 @@ pub fn start(
                     }
 
                     // attempt to mine a block
-                    let ret = bc.mine(local_port, nonce, time, txs);
+                    let ret = bc.mine(whoami, nonce, time, txs);
 
                     // bump nonce
                     nonce = if nonce >= u64::max_value() - concurrent_hashes {
@@ -71,8 +73,8 @@ pub fn start(
                 let _ = broadcast::<Block>(
                     ActionType::Broadcast(ObjectType::Block),
                     &block,
-                    &[],
-                    local_port,
+                    &peers,
+                    Some(whoami),
                 );
 
                 // add new block to chain
