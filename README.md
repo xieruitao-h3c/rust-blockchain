@@ -19,7 +19,7 @@ This code has two main features:
 1. Simulatation of transactions being generated and broadcast.
 2. Nodes competing against each other to "mine" a new block.
 
-The best example of this is to open two windows and run `cargo run mine` on both. And in the third window run `cargo run broadcast` -- you will see transactions being created and nodes occasionally generating new blocks.
+The best example of this is to open two windows and run `cargo run mine` on both; and in the third window run `cargo run broadcast`. You will see transactions being created and nodes occasionally generating new blocks.
 
 ---
 
@@ -29,13 +29,13 @@ The best example of this is to open two windows and run `cargo run mine` on both
 
 - The process of mining involves taking transactions from mempool (sorted by fees in descending order) and trying to find a hash that satisfies the difficulty condition by changing the nonce value. Once the block is mined, it's broadcast to the other nodes, and the process starts over on all the peers.
 
-- The peers also support syncing mempool and blockchain. You can watch it in action by starting a second miner *late*. It will request a copy of the blockchain and mempool from others, and resume mining the same data.
+- The peers also support syncing mempool and blockchain. You can watch it in action by starting the second miner late. It will request a copy of the blockchain and mempool from others, and resume mining the same data.
 
-- There is hardly any cryptography here since this was not the main focus.
+- Besides one Sha256 function, there's hardly any cryptography here since this was not the main focus.
 
 ## Contribute
 
-Idiomatic code improvements, bug fixes and general cleanup PRs are more than welcome. However, no promises on merging any major feature additions, since this repo is meant to stay light and simple.
+Idiomatic code improvements, bug fixes and general cleanup PRs are more than welcome. However, no promises on merging any major feature additions, since this repo is meant to stay simple and lightweight.
 
 ## Exercises
 
