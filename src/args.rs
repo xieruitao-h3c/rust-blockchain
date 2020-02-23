@@ -10,8 +10,8 @@ Usage:
   node (-h | --help)
 
 Options:
+  --peers=<ports>  Broadcast to specific ports only.
   -h --help        Show this screen.
-  --peers=<ports>  Optionally limit the ports to broadcast to.
 ";
 
 #[derive(Debug, Deserialize)]
@@ -36,7 +36,7 @@ pub fn get() -> Args {
     }
 
     for p in &args.flag_peers {
-        args.arg_ports.push(p.parse().unwrap());
+        args.arg_ports.push(p.parse().expect("could not parse peers"));
     }
 
     args
