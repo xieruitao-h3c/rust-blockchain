@@ -1,6 +1,6 @@
 # rust-blockchain
 
-A simple blockchain written in Rust. Calling it a *blockchain* is a stretch; this is purely a playground for messing around with code and ideas.
+A simple proof-of-work blockchain written in Rust. Calling it a *blockchain* is a stretch; this is purely a playground for messing around with code and ideas.
 
 [![asciicast](https://asciinema.org/a/304022.svg)](https://asciinema.org/a/304022)
 
