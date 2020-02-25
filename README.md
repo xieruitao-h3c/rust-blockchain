@@ -33,7 +33,7 @@ The best example of this is to open two windows and run `cargo run mine` on both
 
 - Besides one Sha256 function, there's hardly any cryptography here since this was not the main focus.
 
-## Contribute
+## Contributing
 
 Idiomatic code improvements, bug fixes and general cleanup PRs are more than welcome. However, no promises on merging any major feature additions, since this repo is meant to stay simple and lightweight.
 
