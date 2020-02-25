@@ -1,4 +1,4 @@
-# rust-blockchain
+# [rust-blockchain](https://lalot.ai/simple-blockchain-written-in-rust/)
 
 A simple proof-of-work blockchain written in Rust. Calling it a *blockchain* is a stretch; this is purely a playground for messing around with code and ideas.
 
