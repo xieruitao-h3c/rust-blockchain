@@ -5,9 +5,9 @@ const USAGE: &str = "
 A simple blockchain written in Rust.
 
 Usage:
-  node broadcast [--peers=<ports>]
-  node mine
-  node (-h | --help)
+  rust-blockchain broadcast [--peers=<ports>]
+  rust-blockchain mine
+  rust-blockchain (-h | --help)
 
 Options:
   --peers=<ports>  Broadcast to specific ports only.
