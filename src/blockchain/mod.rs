@@ -180,13 +180,13 @@ mod tests {
         let mut nonce: u64 = 0;
 
         loop {
-            nonce += concurrent_hashes;
             if let Some(block) = bc.mine(1111, nonce, SystemTime::now(), mp.get_all().to_vec()) {
                 assert_eq!(block.hash[..difficulty], "0".repeat(difficulty));
                 assert_eq!(block.len(), min_tx_per_block);
 
                 break;
             }
+            nonce += concurrent_hashes;
         }
     }
 
