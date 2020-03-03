@@ -13,13 +13,14 @@ Requires [Rust](https://www.rust-lang.org/) to be installed locally.
 - Run a node to start mining: `cargo run mine`
 - Generate and broadcast transactions (in another window): `cargo run broadcast`
 - Help: `cargo run -- --help`
+- Tests: `cargo test`
 
 ## Design
 
 This code has two main features:
 
 1. Simulatation of transactions being generated and broadcast.
-2. Nodes competing against each other to "mine" a new block.
+1. Nodes competing against each other to "mine" a new block.
 
 The best example of this is to open two windows and run `cargo run mine` on both; and in the third window run `cargo run broadcast`. You will see transactions being created and nodes occasionally generating new blocks.
 
