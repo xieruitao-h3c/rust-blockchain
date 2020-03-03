@@ -2,7 +2,7 @@
 
 A simple proof-of-work blockchain written in Rust. Calling it a *blockchain* is a stretch; this is purely a playground for messing around with code and ideas.
 
-[![asciicast](https://asciinema.org/a/304022.svg)](https://asciinema.org/a/304022)
+[![asciicast](https://asciinema.org/a/307048.svg)](https://asciinema.org/a/307048)
 
 There's also [the same implementation written in Go](https://github.com/lalotai/go-blockchain).
 
