@@ -59,7 +59,7 @@ fn handler(
         return Ok(());
     }
 
-    // received a blocks response from requested sync
+    // received a blocks response from a requested sync
     if let Ok(command) = serde_json::from_str::<Command<SyncResponse<Block>>>(&text) {
         let payload = &command.payload;
         let mut bc = blockchain.lock().unwrap();
@@ -87,7 +87,7 @@ fn handler(
     if let Ok(command) = serde_json::from_str::<Command<Block>>(&text) {
         let block = &command.payload;
 
-        // remove mined tx from mempool
+        // remove mined txs from mempool
         {
             let mut mp = mempool.lock().unwrap();
             for tx in block.get_all() {

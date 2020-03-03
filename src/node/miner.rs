@@ -59,7 +59,7 @@ pub fn start(
             };
 
             if let Some(block) = output {
-                // remove mined tx from mempool
+                // remove mined txs from mempool
                 {
                     let mut mp = mempool.lock().unwrap();
                     for tx in block.get_all() {

@@ -135,7 +135,7 @@ impl Block {
 
             let mut hash = String::new();
             for h in hasher.result() {
-                hash.push_str(&format!("{:x?}", h));
+                hash.push_str(&format!("{:02x}", h));
             }
 
             return hash;

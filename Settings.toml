@@ -1,4 +1,4 @@
-difficulty = 2
+difficulty = 4
 min_tx_per_block = 5
 concurrent_hashes = 256
 broadcast_random = true
