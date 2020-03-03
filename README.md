@@ -4,6 +4,8 @@ A simple proof-of-work blockchain written in Rust. Calling it a *blockchain* is 
 
 [![asciicast](https://asciinema.org/a/304022.svg)](https://asciinema.org/a/304022)
 
+There's also [the same implementation written in Go](https://github.com/lalotai/go-blockchain).
+
 ## Get started
 
 Requires [Rust](https://www.rust-lang.org/) to be installed locally.
