@@ -3,6 +3,7 @@ use rayon::prelude::*;
 use crate::types::*;
 use serde::{Serialize, Deserialize};
 use sha2::{Sha256, Digest};
+use hex;
 use crate::config::*;
 
 pub struct Blockchain {
@@ -132,13 +133,7 @@ impl Block {
         if let Ok(serialized) = serde_json::to_string(&block) {
             let mut hasher = Sha256::default();
             hasher.input(serialized);
-
-            let mut hash = String::new();
-            for h in hasher.result() {
-                hash.push_str(&format!("{:02x}", h));
-            }
-
-            return hash;
+            return hex::encode(hasher.result())
         }
 
         String::new()
