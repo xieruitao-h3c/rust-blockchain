@@ -3,6 +3,10 @@ name = "rust-blockchain"
 version = "0.1.0"
 authors = ["Lalotai <hi@lalot.ai>"]
 edition = "2018"
+license = "MIT"
+readme = "README.md"
+keywords = [ "blockchain", "rust" ]
+repository = "https://github.com/lalotai/rust-blockchain"
 
 [dependencies]
 docopt = "1.1"
