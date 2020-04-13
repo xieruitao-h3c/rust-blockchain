@@ -5,6 +5,7 @@ use serde::{Serialize, Deserialize};
 use sha2::{Sha256, Digest};
 use hex;
 use crate::config::*;
+use std::convert::TryInto;
 
 pub struct Blockchain {
     chain: Vec<Block>,
@@ -66,7 +67,7 @@ impl Blockchain {
                     prev.clone(),
                     txs.clone(),
                     nonce,
-                    time.elapsed().unwrap().as_millis(),
+                    time.elapsed().unwrap().as_millis().try_into().unwrap(),
                 );
 
                 let hash = block.generate_hash();
@@ -111,11 +112,11 @@ pub struct Block {
     pub hash: String,
     pub prev: String,
     pub txs: Vec<Tx>,
-    pub ms: u128,
+    pub ms: u64,
 }
 
 impl Block {
-    pub fn new(id: u16, prev: String, txs: Vec<Tx>, nonce: u64, ms: u128) -> Self {
+    pub fn new(id: u16, prev: String, txs: Vec<Tx>, nonce: u64, ms: u64) -> Self {
         Block {
             id,
             nonce,
