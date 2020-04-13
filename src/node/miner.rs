@@ -3,7 +3,7 @@ use std::thread;
 use std::sync::{Mutex, Arc, mpsc};
 use crate::mempool::Mempool;
 use crate::blockchain::*;
-use crate::utils::*;
+use crate::network::*;
 use crate::types::*;
 
 pub fn start(

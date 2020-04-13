@@ -5,7 +5,7 @@ use std::io;
 use std::sync::{Mutex, Arc, mpsc};
 
 use crate::types::*;
-use crate::utils::*;
+use crate::network::*;
 use crate::mempool::Mempool;
 use crate::blockchain::*;
 

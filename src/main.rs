@@ -4,7 +4,7 @@ extern crate lazy_static;
 mod config;
 mod args;
 mod types;
-mod utils;
+mod network;
 mod tx;
 mod mempool;
 mod node;

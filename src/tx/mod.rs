@@ -3,7 +3,7 @@ use std::time::Duration;
 use std::sync::mpsc::channel;
 use rand::prelude::*;
 use crate::types::*;
-use crate::utils::broadcast;
+use crate::network::broadcast;
 use crate::config::*;
 
 fn get_wallets(randomize: bool, i: usize) -> (char, char) {
